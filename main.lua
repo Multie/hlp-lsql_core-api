@@ -105,9 +105,18 @@ end
 --- the tables in memory are valid enough
 --- to be saved onto disk
 local function checkIntegrity()
+	-- check table names
 
+	-- check table rawcontents
+
+	-- check definition
+
+	-- check relational dependencies
 end
 
+---
+--- creates a new table 
+---
 function newTable( name )
 
 	-- check for valid name
@@ -148,4 +157,70 @@ function deleteTable( name )
 
 	-- save
 	save()
+end
+
+###################################################################################################################################################
+
+
+function newTable()
+	local tbl = {}
+	local tblmt = {}
+	tblmt.columns = {}
+	tblmt.entities = {}
+	function tblmt.__newindex(self, key)
+		if(key == "addColumn") then
+
+		elseif(key == "dropColumn") then
+
+		elseif(key == "updateColumn") then
+
+		end
+	end
+	setmetatable(tblmt, tbl)
+	return tbl
+end
+
+function newDatabase( file )
+	local db = {}
+	local dbmt = {}
+	dbmt.lsql = {}
+	dbmt.lsql.path = file
+	dbmt.lsql.tables = {}
+	function dbmt.__newindex(self, key)
+		if(key == "addTable") then
+			local function addTable(name, sqlTable)
+				--check for valid name
+				--check for existance
+				--check table integrity
+				--add table definition to database
+			end
+			return addTable
+		elseif(key == "renameTable") then
+			local function renameTable(newName, sqlTable)
+				--check for valid name
+				--check for existance
+				--change table name in database
+			end
+			return renameTable
+		elseif(key == "dropTable") then
+			local function dropTable(sqlTable)
+				--check for valid name
+				--check for existance
+				--drop table name from database
+			end
+			return dropTable
+		else
+			if(type(key) ~= string) then
+				error("database handle only allows for strings as table names, got "..type(key), 2)
+			end
+			for k,v in pairs(lsql.tables) do
+				if(k == key) then
+					return v
+				end
+			end
+			error("your database does not contain a table called: "..key, 2)
+		end
+	end
+	setmetatable(dbmt, db)
+	return db
 end
