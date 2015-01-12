@@ -3,17 +3,6 @@
 	Author: CCodeX
 ]]
 
---storage
-local sqlTables = {}
-local sqlRelations = {}
-
-sqlRelation = {
-	table1 = "",
-	colone = "",
-	table2 = "",
-	colmany = "",
-}
-
 local function verifyName( name )
 	--check for name being a string
 	if(not (type(name) == "string")) then
@@ -54,122 +43,46 @@ local function verifyName( name )
 	end	
 end
 
-function saveToDisk( file )
-	
-	-- dump to single table
-	local dump = {["tables"] = sqlTables, ["relations"] = sqlRelations}
+local colTypes = {}
 
-	-- serialize
-	local dumpString = textutils.serialize(dump)
 
-	-- save
-	local file = fs.open(file, "w")
-	file.write(dumpString)
-	file.close()
+
+function newColumn(obj)
+	obj = obj or {}
+	local col = {}
+	local colmt = {}
+	colmt.lsql = {}
+
+	--defaults
+	colmt.lsql.PK = obj.PK or false
+	colmt.lsql.UQ = obj.UQ or false
+	colmt.lsql.NN = obj.NN or false
+	colmt.lsql.UN = obj.UN or false
+	colmt.lsql.type = obj.type or "int"
+	colmt.lsql.relation = obj.relation or false
+
+	--backtrack
+	colmt.lsql.upperTable = obj.upperTable or nil
+
+	setmetatable(colmt, col)
+	return col
 end
-function loadFromDisk( file )
-
-	-- clear current state
-	for k,v in pairs(sqlTables) do
-		sqlTables[k] = nil
-	end
-	for k,v in pairs(sqlRelations) do
-		sqlRelations[k] = nil
-	end
-
-	-- load
-	local file = fs.open( file, "r")
-	local dumpString = file.readAll()
-	file.close()
-
-	-- unserialize
-	local dump = textutils.unserialize(dumpString)
-
-	-- insert to state
-	for k,v in pairs(dump.tables) do
-		sqlTables[k] = v
-	end
-	for k,v in pairs(dump.relations) do
-		sqlRelations[k] = v
-	end
-end
-local filename = "db.dump"
-function setFile( file )
-	filename = file
-end
-local function save()
-	saveToDisk(filename)
-end
-
---- this checks wether the current state of
---- the tables in memory are valid enough
---- to be saved onto disk
-local function checkIntegrity()
-	-- check table names
-
-	-- check table rawcontents
-
-	-- check definition
-
-	-- check relational dependencies
-end
-
----
---- creates a new table 
----
-function newTable( name )
-
-	-- check for valid name
-	local e
-	local m
-	e, m = pcall(verifyName, name)
-	if(not e) then
-		error(m, 2)
-	end
-
-	-- check whether a table is already existant
-	if(sqlTables[name] ~= nil) then
-		error("a table with this name already exists: "..name, 2)
-	end
-
-	-- add new table
-	sqlTables[name] = {}
-
-	-- save
-	save()
-end
-function deleteTable( name )
-	-- check for valid name
-	local e
-	local m
-	e, m = pcall(verifyName, name)
-	if(not e) then
-		error(m, 2)
-	end
-
-	-- check whether a table is already existant
-	if(sqlTables[name] == nil) then
-		error("a table with this name does not exist: "..name, 2)
-	end
-
-	-- delete table
-	sqlTables[name] = nil
-
-	-- save
-	save()
-end
-
-###################################################################################################################################################
-
 
 function newTable()
 	local tbl = {}
 	local tblmt = {}
-	tblmt.columns = {}
-	tblmt.entities = {}
+	tblmt.lsql.columns = {}
+	tblmt.lsql.entities = {}
+
+	--backtrack
+	tblmt.lsql.upperDB = nil
+
 	function tblmt.__newindex(self, key)
 		if(key == "addColumn") then
-
+			--check for valid name
+			--check for existance
+			--check col integrity
+			--
 		elseif(key == "dropColumn") then
 
 		elseif(key == "updateColumn") then
